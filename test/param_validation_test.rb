@@ -105,7 +105,6 @@ class ParamValidationTest < Minitest::Test
     rescue ParamValidation::Error => e
       e
     end
-    binding.pry
     assert_equal e.message, "x must be a dollar amount"
   end
 end
