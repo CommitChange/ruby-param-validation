@@ -5,7 +5,7 @@ A standalone and simple ruby hash validation lib, useful for validating the data
 ```rb
 new_charge_validation = {
   amount: {
-    presence: :required
+    required: true
   },
   stripe_card_token: {
     required: true,
