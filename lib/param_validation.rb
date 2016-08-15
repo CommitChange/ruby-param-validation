@@ -77,5 +77,12 @@ class ParamValidation
       {message: @message, key: @key, val: @val, name: @name}
     end
   end
+
+  # A convient error class to return if a required record is not found
+  class NotFound < RuntimeError
+    def initialize(message="Record not found.")
+      super
+    end
+  end
 end
 
