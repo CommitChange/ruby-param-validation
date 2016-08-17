@@ -4,7 +4,7 @@ class ParamValidation
   # Given a hash of data and a validation hash, check all the validations, raising an Error on the first invalid key
   def initialize(data, validations)
     validations.each do |key, validators|
-      val = key === :root ? data : data[key]
+      val = key === :root ? data : (data[key] || data[key.to_s] || data[key.to_sym])
       validators.each do |name, arg|
         validator = @@validators[name]
         msg = validations[key][:message]
