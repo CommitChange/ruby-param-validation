@@ -15,7 +15,6 @@ class ParamValidation
         raise Error.new(msg, {key: key, val: val, name: name}) unless is_valid
       end
     end
-    return true
   end
 
   def self.messages; @@messages; end
@@ -55,7 +54,7 @@ class ParamValidation
     is_hash: Proc.new{|val, arg, data| val.is_a?(Hash)},
     is_json: Proc.new{|val, arg, data| ParamValidation.is_valid_json?(val)},
     in_range: Proc.new{|val, arg, data| arg.cover?(val)},
-    array_of_hashes: Proc.new{|val, arg, data| data.is_a?(Array) && data.map{|key, val| ParamValidation.new({key: val}, arg)}.all?}
+    array_of_hashes: Proc.new{|val, arg, data| data.is_a?(Array) && data.map{|pair| ParamValidation.new(pair.to_h, arg)}.all?}
   }
 
   @@messages = {

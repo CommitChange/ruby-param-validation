@@ -92,6 +92,10 @@ class ParamValidationTest < Minitest::Test
     rescue ParamValidation::Error => e; e; end
     assert_equal "Please pass in an array of hashes", e.to_s
   end
+  def test_root_array_of_hashes_with_nesting_ok
+    v = ParamValidation.new([{x: 1}, {x: 1}], {root: {array_of_hashes: {x: {is_integer: true}}}})
+    assert_equal v, v # test that it does not raise
+  end
   def test_root_array_of_hashes_with_nesting
     begin; ParamValidation.new([{x: 1}, {x: 'hi'}], {root: {array_of_hashes: {x: {is_integer: true}}}})
     rescue ParamValidation::Error => e; e; end
