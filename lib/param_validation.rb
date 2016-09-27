@@ -5,6 +5,7 @@ class ParamValidation
   def initialize(data, validations)
     validations.each do |key, validators|
       val = key === :root ? data : (data[key] || data[key.to_s] || data[key.to_sym])
+      next if validators[:required].nil? && val.nil?
       validators.each do |name, arg|
         validator = @@validators[name]
         msg = validations[key][:message]
@@ -36,44 +37,44 @@ class ParamValidation
   #  - arg is the argument passed into the validator (eg for {required: true}, it is `true`)
   #  - data is the entire set of data
   @@validators = {
-    required:  Proc.new {|val, arg, data| !val.nil?},
-    absent: Proc.new {|val, arg, data| val.nil?},
-    not_included_in: Proc.new {|val, arg, data| !arg.include?(val)},
-    included_in: Proc.new {|val, arg, data| arg.include?(val)},
-    format: Proc.new {|val, arg, data| val =~ arg},
-    is_integer: Proc.new {|val, arg, data| val.is_a?(Integer) || val =~ /\A[+-]?\d+\Z/},
-    is_float: Proc.new {|val, arg, data| val.is_a?(Float) || (!!Float(val) rescue false) },
-    min_length: Proc.new{|val, arg, data| val.count >= arg},
-    max_length: Proc.new{|val, arg, data| val.count <= arg},
-    length_range: Proc.new{|val, arg, data| arg.cover?(val.count)},
-    length_equals: Proc.new{|val, arg, data| val.count == arg},
-    equals: Proc.new{|val, arg, data| val == arg},
-    min: Proc.new{|val, arg, data| val >= arg},
-    max: Proc.new{|val, arg, data| val <= arg},
-    is_array: Proc.new{|val, arg, data| val.is_a?(Array)},
-    is_hash: Proc.new{|val, arg, data| val.is_a?(Hash)},
-    is_json: Proc.new{|val, arg, data| ParamValidation.is_valid_json?(val)},
-    in_range: Proc.new{|val, arg, data| arg.cover?(val)},
-    array_of_hashes: Proc.new{|val, arg, data| data.is_a?(Array) && data.map{|pair| ParamValidation.new(pair.to_h, arg)}.all?}
+    required:  lambda {|val, arg, data| !val.nil?},
+    absent: lambda {|val, arg, data| val.nil?},
+    not_included_in: lambda {|val, arg, data| !arg.include?(val)},
+    included_in: lambda {|val, arg, data| arg.include?(val)},
+    format: lambda {|val, arg, data| val =~ arg},
+    is_integer: lambda {|val, arg, data| val.is_a?(Integer) || val =~ /\A[+-]?\d+\Z/},
+    is_float: lambda {|val, arg, data| val.is_a?(Float) || (!!Float(val) rescue false) },
+    min_length: lambda {|val, arg, data| val.count >= arg},
+    max_length: lambda {|val, arg, data| val.count <= arg},
+    length_range: lambda {|val, arg, data| arg.cover?(val.count)},
+    length_equals: lambda {|val, arg, data| val.count == arg},
+    equals: lambda {|val, arg, data| val == arg},
+    min: lambda {|val, arg, data| val >= arg},
+    max: lambda {|val, arg, data| val <= arg},
+    is_array: lambda {|val, arg, data| val.is_a?(Array)},
+    is_hash: lambda {|val, arg, data| val.is_a?(Hash)},
+    is_json: lambda {|val, arg, data| ParamValidation.is_valid_json?(val)},
+    in_range: lambda {|val, arg, data| arg.cover?(val)},
+    array_of_hashes: lambda {|val, arg, data| data.is_a?(Array) && data.map{|pair| ParamValidation.new(pair.to_h, arg)}.all?}
   }
 
   @@messages = {
-    required: Proc.new {|h| "#{h[:key]} is required"},
-    absent: Proc.new {|h| "#{h[:key]} must not be present"},
-    not_included_in: Proc.new {|h| "#{h[:key]} must not be included in #{h[:arg].join(", ")}"},
-    included_in: Proc.new {|h|"#{h[:key]} must be one of #{h[:arg].join(", ")}"},
-    format: Proc.new {|h|"#{h[:key]} doesn't have the right format"},
-    is_integer: Proc.new {|h|"#{h[:key]} should be an integer"},
-    is_float: Proc.new {|h|"#{h[:key]} is required"},
-    min_length: Proc.new {|h|"#{h[:key]} is required"},
-    max_length: Proc.new {|h|"#{h[:key]} is required"},
-    length_range: Proc.new {|h|"#{h[:key]} is required"},
-    length_equals: Proc.new {|h|"#{h[:key]} is required"},
-    equals: Proc.new {|h|"#{h[:key]} is required"},
-    min: Proc.new {|h|"#{h[:key]} is required"},
-    max: Proc.new {|h|"#{h[:key]} is required"},
-    in_range: Proc.new {|h|"#{h[:key]} is required"},
-    array_of_hashes: Proc.new{|h| "Please pass in an array of hashes"}
+    required: lambda {|h| "#{h[:key]} is required"},
+    absent: lambda {|h| "#{h[:key]} must not be present"},
+    not_included_in: lambda {|h| "#{h[:key]} must not be included in #{h[:arg].join(", ")}"},
+    included_in: lambda {|h|"#{h[:key]} must be one of #{h[:arg].join(", ")}"},
+    format: lambda {|h|"#{h[:key]} doesn't have the right format"},
+    is_integer: lambda {|h|"#{h[:key]} should be an integer"},
+    is_float: lambda {|h|"#{h[:key]} is required"},
+    min_length: lambda {|h|"#{h[:key]} is required"},
+    max_length: lambda {|h|"#{h[:key]} is required"},
+    length_range: lambda {|h|"#{h[:key]} is required"},
+    length_equals: lambda {|h|"#{h[:key]} is required"},
+    equals: lambda {|h|"#{h[:key]} is required"},
+    min: lambda {|h|"#{h[:key]} is required"},
+    max: lambda {|h|"#{h[:key]} is required"},
+    in_range: lambda {|h|"#{h[:key]} is required"},
+    array_of_hashes: lambda {|h| "Please pass in an array of hashes"}
   }
 
 
@@ -81,7 +82,7 @@ class ParamValidation
     attr_accessor :key, :message, :val, :name
     def initialize(message, data)
       @data = data
-      super message
+      super(message)
     end
     def data; @data; end
   end

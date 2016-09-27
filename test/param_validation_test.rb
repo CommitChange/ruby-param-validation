@@ -12,6 +12,11 @@ class ParamValidationTest < Minitest::Test
     rescue ParamValidation::Error => e; e; end
     assert_equal :x, e.data[:key]
   end
+  # If a key is not required, then don't run the tests on it
+  def test_not_required_and_absent_then_tests_do_not_run
+    ParamValidation.new({}, {x: {max: 100}})
+    assert true
+  end
   def test_require_no_err
     begin; ParamValidation.new({x: 1}, {x: {required: true}})
     rescue ParamValidation::Error => e; end
@@ -93,7 +98,7 @@ class ParamValidationTest < Minitest::Test
     assert_equal "Please pass in an array of hashes", e.to_s
   end
   def test_root_array_of_hashes_with_nesting_ok
-    v = ParamValidation.new([{x: 1}, {x: 1}], {root: {array_of_hashes: {x: {is_integer: true}}}})
+    v = ParamValidation.new([{'x' => 1}, {x: 1}], {root: {array_of_hashes: {x: {is_integer: true}}}})
     assert_equal v, v # test that it does not raise
   end
   def test_root_array_of_hashes_with_nesting
