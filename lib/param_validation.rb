@@ -39,7 +39,7 @@ class ParamValidation
   @@validators = {
     required:  lambda {|val, arg, data| !val.nil?},
     absent: lambda {|val, arg, data| val.nil?},
-    present_string: lambda {|val, arg, data| val.is_a?(String) && val.length > 0},
+    not_blank: lambda {|val, arg, data| val.is_a?(String) && val.length > 0},
     not_included_in: lambda {|val, arg, data| !arg.include?(val)},
     included_in: lambda {|val, arg, data| arg.include?(val)},
     format: lambda {|val, arg, data| val =~ arg},

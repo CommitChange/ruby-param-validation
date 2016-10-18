@@ -17,13 +17,18 @@ class ParamValidationTest < Minitest::Test
     ParamValidation.new({}, {x: {max: 100}})
     assert true
   end
-  def test_present_string_fail
-    begin; ParamValidation.new({x: ''}, {x: {present_string: true}})
+  def test_not_blank_fail
+    begin; ParamValidation.new({x: ''}, {x: {not_blank: true}})
     rescue ParamValidation::Error => e; e; end
     assert_equal :x, e.data[:key]
   end
-  def test_present_string_succeed
-    ParamValidation.new({x: 'x'}, {x: {present_string: true}})
+  def test_not_blank_fail_nil
+    begin; ParamValidation.new({x: nil}, {x: {not_blank: true, required: true}})
+    rescue ParamValidation::Error => e; e; end
+    assert_equal :x, e.data[:key]
+  end
+  def test_not_blank_succeed
+    ParamValidation.new({x: 'x'}, {x: {not_blank: true}})
     assert true
   end
   def test_require_no_err
