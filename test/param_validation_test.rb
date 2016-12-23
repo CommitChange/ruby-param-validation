@@ -104,7 +104,7 @@ class ParamValidationTest < Minitest::Test
   def test_equals
     begin; ParamValidation.new({x: 1}, {x: {equals: 2}})
     rescue ParamValidation::Error => e; e; end
-    assert_equal "x is required", e.to_s
+    assert_equal "x should equal #{2}", e.to_s
   end
   def test_root_array_of_hashes
     begin; ParamValidation.new({x: 1}, {root: {array_of_hashes: {x: {required: true}}}})
@@ -139,5 +139,8 @@ class ParamValidationTest < Minitest::Test
       e
     end
     assert_equal "x must be a dollar amount", e.to_s
+  end
+
+  def test_custom_validator
   end
 end
