@@ -78,23 +78,6 @@ class ParamValidation
     array_of_hashes: lambda {|h| "Please pass in an array of hashes"}
   }
 
-
-  class Error < RuntimeError
-    attr_accessor :key, :message, :val, :name
-    def initialize(message, data)
-      @data = data
-      super(message)
-    end
-    def data; @data; end
-  end
-
-  # A convient error class to return if a required record is not found
-  class NotFound < RuntimeError
-    def initialize(message="Record not found.")
-      super(message)
-    end
-  end
-
   # small utility for testing json validity
   def self.is_valid_json?(str)
     begin
@@ -104,5 +87,17 @@ class ParamValidation
       return false
     end
   end
+
+  # Special error class that holds all the error data for reference
+  class Error < RuntimeError
+    attr_accessor :key, :message, :val, :name
+    def initialize(message, data)
+      @data = data
+      @message = message
+      super(message)
+    end
+    def data; @data; end
+  end
+
 end
 
