@@ -13,7 +13,7 @@ class ParamValidation
         is_valid = @@validators[name].call(val, arg, data)
         msg_proc = @@messages[name]
         msg ||= @@messages[name].call({key: key, data: data, val: val, arg: arg}) if msg_proc
-        raise Error.new(msg, {key: key, val: val, name: name}) unless is_valid
+        raise ValidationError.new(msg, {key: key, val: val, name: name}) unless is_valid
       end
     end
   end
@@ -89,14 +89,12 @@ class ParamValidation
   end
 
   # Special error class that holds all the error data for reference
-  class Error < RuntimeError
-    attr_accessor :key, :message, :val, :name
-    def initialize(message, data)
+  class ValidationError < TypeError
+    attr_reader :data
+    def initialize(msg, data)
       @data = data
-      @message = message
-      super(message)
+      super(msg)
     end
-    def data; @data; end
   end
 
 end
