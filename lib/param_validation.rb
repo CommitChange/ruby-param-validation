@@ -2,7 +2,9 @@
 class ParamValidation
 
   # Given a hash of data and a validation hash, check all the validations, raising an Error on the first invalid key
+  # @raise [ValidationError] if one or more of the validations fail.
   def initialize(data, validations)
+    errors = []
     validations.each do |key, validators|
       val = key === :root ? data : (data[key] || data[key.to_s] || data[key.to_sym])
       next if validators[:required].nil? && val.nil?
@@ -13,8 +15,14 @@ class ParamValidation
         is_valid = @@validators[name].call(val, arg, data)
         msg_proc = @@messages[name]
         msg ||= @@messages[name].call({key: key, data: data, val: val, arg: arg}) if msg_proc
-        raise ValidationError.new(msg, {key: key, val: val, name: name}) unless is_valid
+        errors.push({msg: msg, data: {key: key, val: val, name: name}}) unless is_valid
       end
+    end
+    if errors.length == 1
+      raise ValidationError.new(errors[0][:msg], errors[0][:data])
+    elsif errors.length > 1
+      msg = errors.collect {|e| e[:msg]}.join('\n')
+      raise ValidationError.new(msg, errors.collect{|e| e[:data]})
     end
   end
 
@@ -62,6 +70,7 @@ class ParamValidation
   @@messages = {
     required: lambda {|h| "#{h[:key]} is required"},
     absent: lambda {|h| "#{h[:key]} must not be present"},
+    not_blank: lambda {|h| "#{h[:key]} must not be blank"},
     not_included_in: lambda {|h| "#{h[:key]} must not be included in #{h[:arg].join(", ")}"},
     included_in: lambda {|h|"#{h[:key]} must be one of #{h[:arg].join(", ")}"},
     format: lambda {|h|"#{h[:key]} doesn't have the right format"},
@@ -91,6 +100,15 @@ class ParamValidation
   # Special error class that holds all the error data for reference
   class ValidationError < TypeError
     attr_reader :data
+
+    # @param [String] msg message for the validation error(s). Multiple error
+    #   messages are split by new lines (\n)
+    # @param [Hash, Array<Hash>] data information about the validation failure
+    #   or failures. If one failure, a single failure hash is returned, if multiple, an array is returned.
+    #   Each failure hash has the following:
+    #     * :key - the [Symbol] of the key in the hash where verification failed
+    #     * :val - the value of pair in the hash selected by :key
+    #     * :name - the [Symbol] for the verification which failed
     def initialize(msg, data)
       @data = data
       super(msg)

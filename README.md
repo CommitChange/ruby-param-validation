@@ -25,7 +25,7 @@ hash and runs validations on them. If a value is invalid, an exception is
 thrown. The exception can be handled outside your function call, typically in a
 controller/router or in a test suite.
 
-An exception is thrown on the first invalid key that is found.
+An exception is thrown for each failure.
 
 ## ParamValidation::Error
 

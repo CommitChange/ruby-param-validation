@@ -1,6 +1,5 @@
 require './lib/param_validation.rb'
 require 'minitest/autorun'
-require 'pry'
 
 class ParamValidationTest < Minitest::Test
 
@@ -25,7 +24,8 @@ class ParamValidationTest < Minitest::Test
   def test_not_blank_fail_nil
     begin; ParamValidation.new({x: nil}, {x: {not_blank: true, required: true}})
     rescue ParamValidation::ValidationError => e; e; end
-    assert_equal :x, e.data[:key]
+    assert(e.data.one?{|i| i[:name] == :not_blank && i[:key] == :x})
+    assert(e.data.one?{|i| i[:name] == :required && i[:key] == :x})
   end
   def test_not_blank_succeed
     ParamValidation.new({x: 'x'}, {x: {not_blank: true}})
