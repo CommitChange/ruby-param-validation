@@ -15,7 +15,7 @@ class ParamValidation
         is_valid = @@validators[name].call(val, arg, data)
         msg_proc = @@messages[name]
         msg ||= @@messages[name].call({key: key, data: data, val: val, arg: arg}) if msg_proc
-        errors.push({msg: msg, data: {key: key, val: val, name: name}}) unless is_valid
+        errors.push({msg: msg, data: {key: key, val: val, name: name, msg: msg}}) unless is_valid
       end
     end
     if errors.length == 1
@@ -109,6 +109,7 @@ class ParamValidation
     #     * :key - the [Symbol] of the key in the hash where verification failed
     #     * :val - the value of pair in the hash selected by :key
     #     * :name - the [Symbol] for the verification which failed
+    #     * :msg - the [String] for the msg for the verifications which failed
     def initialize(msg, data)
       @data = data
       super(msg)
