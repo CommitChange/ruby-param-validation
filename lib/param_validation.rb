@@ -64,6 +64,7 @@ class ParamValidation
     is_hash: lambda {|val, arg, data| val.is_a?(Hash)},
     is_json: lambda {|val, arg, data| ParamValidation.is_valid_json?(val)},
     in_range: lambda {|val, arg, data| arg.cover?(val)},
+    is_a: lambda {|val, arg, data| arg.kind_of?(Enumerable) ? arg.any? {|i| val.is_a?(i)} : val.is_a?(arg)},
     array_of_hashes: lambda {|val, arg, data| data.is_a?(Array) && data.map{|pair| ParamValidation.new(pair.to_h, arg)}.all?}
   }
 
@@ -84,6 +85,7 @@ class ParamValidation
     min: lambda {|h|"#{h[:key]} must be at least #{h[:min]}"},
     max: lambda {|h|"#{h[:key]} cannot be more than #{h[:max]}"},
     in_range: lambda {|h|"#{h[:key]} should be within #{h[:arg]}"},
+    is_a: lambda  {|h| "#{h[:key]} should be of the type(s): #{h[:arg].kind_of?(Enumerable) ? h[:arg].join(', '): h[:arg]}"},
     array_of_hashes: lambda {|h| "Please pass in an array of hashes"}
   }
 

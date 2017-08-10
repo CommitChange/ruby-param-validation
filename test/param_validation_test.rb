@@ -121,6 +121,27 @@ class ParamValidationTest < Minitest::Test
     assert_equal "x should be an integer", e.to_s
   end
 
+  def test_is_a_single
+    ParamValidation.new({x: 5.6}, {x: {is_a: Float}})
+    begin
+      ParamValidation.new({x: 5.6}, {x: {is_a: Integer}})
+    rescue ParamValidation::ValidationError => e
+      e
+    end
+    assert_equal 'x should be of the type(s): Integer', e.to_s
+  end
+
+  def test_is_a_multiple
+    ParamValidation.new({x: 5.6}, {x: {is_a: [Integer,Float]}})
+    begin
+      ParamValidation.new({x: 5.6}, {x: {is_a: [Integer, Array]}})
+    rescue ParamValidation::ValidationError => e
+      e
+    end
+
+    assert_equal 'x should be of the type(s): Integer, Array', e.to_s
+  end
+
   def test_add_validator
     ParamValidation.add_validator(:dollars){|val, arg, data| val =~ /^\d+(\.\d\d)?$/}
     begin
