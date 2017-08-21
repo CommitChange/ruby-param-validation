@@ -96,7 +96,7 @@ class ParamValidation
     begin
       JSON.parse(str)
       return true
-    rescue JSON::ParserError => e
+    rescue => e
       return false
     end
   end
