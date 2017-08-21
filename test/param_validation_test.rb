@@ -121,6 +121,12 @@ class ParamValidationTest < Minitest::Test
     assert_equal "x should be an integer", e.to_s
   end
 
+  def test_is_json
+    begin; ParamValidation.new({x: '[[[[[[['}, {x: {is_json: true}})
+    rescue ParamValidation::ValidationError => e; e; end
+    assert_equal "x should be valid JSON", e.to_s
+  end
+
   def test_is_a_single
     ParamValidation.new({x: 5.6}, {x: {is_a: Float}})
     begin

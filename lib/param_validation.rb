@@ -1,3 +1,4 @@
+require 'json'
 
 class ParamValidation
 
@@ -85,6 +86,7 @@ class ParamValidation
     min: lambda {|h|"#{h[:key]} must be at least #{h[:min]}"},
     max: lambda {|h|"#{h[:key]} cannot be more than #{h[:max]}"},
     in_range: lambda {|h|"#{h[:key]} should be within #{h[:arg]}"},
+    is_json: lambda {|h| "#{h[:key]} should be valid JSON"},
     is_a: lambda  {|h| "#{h[:key]} should be of the type(s): #{h[:arg].kind_of?(Enumerable) ? h[:arg].join(', '): h[:arg]}"},
     array_of_hashes: lambda {|h| "Please pass in an array of hashes"}
   }
@@ -94,7 +96,7 @@ class ParamValidation
     begin
       JSON.parse(str)
       return true
-    rescue JSON::ParseError => e
+    rescue JSON::ParserError => e
       return false
     end
   end
