@@ -87,6 +87,7 @@ class ParamValidation
     max: lambda {|h|"#{h[:key]} cannot be more than #{h[:max]}"},
     in_range: lambda {|h|"#{h[:key]} should be within #{h[:arg]}"},
     is_json: lambda {|h| "#{h[:key]} should be valid JSON"},
+    is_hash: lambda {|h| "#{h[:key]} should be a hash"},
     is_a: lambda  {|h| "#{h[:key]} should be of the type(s): #{h[:arg].kind_of?(Enumerable) ? h[:arg].join(', '): h[:arg]}"},
     array_of_hashes: lambda {|h| "Please pass in an array of hashes"}
   }
