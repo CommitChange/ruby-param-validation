@@ -56,6 +56,26 @@ class ParamValidationTest < Minitest::Test
     rescue ParamValidation::ValidationError => e; e; end
     assert_equal :x, e.data[:key]
   end
+
+  def test_is_reference_string
+    begin; ParamValidation.new({x: '-0'}, {x: {is_reference: true}})
+    rescue ParamValidation::ValidationError => e; e; end
+    assert_equal :x, e.data[:key]
+  end
+
+  def test_is_reference_negative_integer
+    begin; ParamValidation.new({x: -1}, {x: {is_reference: true}})
+    rescue ParamValidation::ValidationError => e; e; end
+    assert_equal :x, e.data[:key]
+  end
+
+  def test_is_reference_passes
+    ParamValidation.new({x: '0'}, {x: {is_reference: true}})
+    ParamValidation.new({x: 1}, {x: {is_reference: true}})
+    ParamValidation.new({x: ''}, {x: {is_reference: true}})
+    pass()
+  end
+
   def test_is_integer
     begin; ParamValidation.new({x: 'x'}, {x: {is_integer: true}})
     rescue ParamValidation::ValidationError => e; e; end
