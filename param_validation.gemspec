@@ -10,5 +10,5 @@ Gem::Specification.new do |s|
   s.homepage = 'https://github.com/jayrbolton/ruby-param-validation'
   s.license = 'MIT'
 
-  s.add_dependency 'chronic'
+  s.add_runtime_dependency 'chronic'
 end
