@@ -163,6 +163,7 @@ class ParamValidationTest < Minitest::Test
     assert_equal 'x should be of the type(s): Integer', e.to_s
   end
 
+
   def test_is_a_multiple
     ParamValidation.new({x: 5.6}, {x: {is_a: [Integer,Float]}})
     begin
@@ -172,6 +173,21 @@ class ParamValidationTest < Minitest::Test
     end
 
     assert_equal 'x should be of the type(s): Integer, Array', e.to_s
+  end
+
+  def test_can_be_date
+    ParamValidation.new({x: Date.new()}, {x: {can_be_date: true}})
+    ParamValidation.new({x: DateTime.new()}, {x: {can_be_date: true}})
+    ParamValidation.new({x: '2017-05-15T12:00:00.000Z'}, {x: {can_be_date: true}})
+    ParamValidation.new({x: '2017-05-15'}, {x: {can_be_date: true}})
+
+    begin
+      ParamValidation.new({x: 'not_a _date'}, {x: {can_be_date: true}})
+    rescue ParamValidation::ValidationError => e
+      e
+    end
+
+    assert_equal 'x should be a datetime or be parsable as one', e.to_s
   end
 
   def test_add_validator

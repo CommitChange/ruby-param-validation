@@ -1,4 +1,5 @@
 require 'json'
+require 'chronic'
 
 class ParamValidation
 
@@ -67,6 +68,7 @@ class ParamValidation
     is_json: lambda {|val, arg, data| ParamValidation.is_valid_json?(val)},
     in_range: lambda {|val, arg, data| arg.cover?(val) rescue false},
     is_a: lambda {|val, arg, data| arg.kind_of?(Enumerable) ? arg.any? {|i| val.is_a?(i)} : val.is_a?(arg)},
+    can_be_date: lambda {|val, arg, data| val.is_a?(Date) || val.is_a?(DateTime) || Chronic.parse(val)},
     array_of_hashes: lambda {|val, arg, data| data.is_a?(Array) && data.map{|pair| ParamValidation.new(pair.to_h, arg)}.all?}
   }
 
@@ -91,6 +93,7 @@ class ParamValidation
     is_json: lambda {|h| "#{h[:key]} should be valid JSON"},
     is_hash: lambda {|h| "#{h[:key]} should be a hash"},
     is_a: lambda  {|h| "#{h[:key]} should be of the type(s): #{h[:arg].kind_of?(Enumerable) ? h[:arg].join(', '): h[:arg]}"},
+    can_be_date: lambda  {|h| "#{h[:key]} should be a datetime or be parsable as one"},
     array_of_hashes: lambda {|h| "Please pass in an array of hashes"}
   }
 

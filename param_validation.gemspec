@@ -9,4 +9,6 @@ Gem::Specification.new do |s|
   s.files = 'lib/param_validation.rb'
   s.homepage = 'https://github.com/jayrbolton/ruby-param-validation'
   s.license = 'MIT'
+
+  add_dependency 'chronic'
 end
