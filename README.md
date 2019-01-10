@@ -1,3 +1,5 @@
+# Deprecated. Maintained as part of [Houdini](https://github.com/houdiniproject/houdini)
+
 # ParamValidation
 
 A standalone and simple ruby hash validation lib, useful for validating the data passed to your functions. 
